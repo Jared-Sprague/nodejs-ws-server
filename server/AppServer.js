@@ -2,6 +2,22 @@ var NODEJS = typeof module !== 'undefined' && module.exports;
 
 var URL = require('url');
 
+// On both the client and server:
+var sp = require('schemapack');
+
+var playersSchema = sp.build(
+    {
+        name: "string",
+        players: [{
+            health: "varuint",
+            jumping: "boolean",
+            position: ["int16"],
+            attributes: {str: 'uint8', agi: 'uint8', int: 'uint8'}
+        }]
+    });
+
+var personSchema = sp.build([ { "name": "string", "numbers": [ "varint" ], "age": "uint8" } ]);
+
 /**
  * This module contains all of the app logic and state,
  * @param wss
@@ -41,11 +57,21 @@ var AppServer = function (wss) {
 
         ws.on('message', function (msg, flags) {
             if (flags.binary) {
-                var ab = toArrayBuffer(msg);
-                var arr = new Int32Array(ab);
-                console.log(arr[0]);
+
+                var players = playersSchema.decode(msg);
+
+                // var persons = personSchema.decode(msg);
+
+
+                // var ab = toArrayBuffer(msg);
+                // var arr = new Int32Array(ab);
+
+                // console.log(persons);
+
+                // console.log(players);
             }
             else {
+
                 console.log(msg);
             }
         });
